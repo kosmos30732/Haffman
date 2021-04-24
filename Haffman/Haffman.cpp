@@ -2,6 +2,8 @@
 #include <fstream>
 #include <cstddef>
 #include <list>
+#include <vector>
+#include <map>
 #define NUM_OF_CHARS 256
 
 using namespace std;
@@ -36,6 +38,26 @@ public:
 
     }
 };
+
+void TreeGo(Node* head, vector<bool>code, map<char, vector<bool>> *list_code)
+{
+    if (head->left!=nullptr)
+    {
+        code.push_back(0);
+        TreeGo(head->left, code, list_code);
+    }
+
+    if (head->rigth != nullptr)
+    {
+        code.push_back(1);
+        TreeGo(head->rigth, code, list_code);
+    }
+
+    if (head->left == nullptr && head->rigth == nullptr)
+    {
+        (*list_code)[head->token] = code;
+    }
+}
 
 int main()
 {
@@ -107,14 +129,20 @@ int main()
             }
         }
         freq_list.insert(iter, new_node);
-        cout << "New iteration" << endl;
-        for (auto it : freq_list)
+    }
+    
+    vector<bool> code;
+    map<char, vector<bool>>* list_code = new map<char, vector<bool>>;
+    TreeGo(*(freq_list.begin()), code, list_code);
+    
+    for (auto it:*(list_code))
+    {
+        cout << it.first << " ";
+        for (auto vec: it.second)
         {
-            cout << it->token << " " << it->freq << endl;
+            cout << vec;
         }
         cout << endl;
     }
-    
-    
     return 0;
 }
