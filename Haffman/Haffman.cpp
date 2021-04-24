@@ -60,17 +60,6 @@ void TreeGo(Node* head, vector<bool>code, map<char, vector<bool>> *list_code)
     }
 }
 
-string GetString(vector<bool>code)
-{
-    string s;
-    for (auto c: code)
-    {
-        s += c;
-    }
-
-    return s;
-}
-
 int main()
 {
     ifstream fin("input.txt");
@@ -116,6 +105,8 @@ int main()
         freq_list.insert(iter, temp);
     }
 
+    fout << freq_list.size() << " ";
+
     for (auto it : freq_list)
     {
         fout << it->token << " " << it->freq << " ";
@@ -155,8 +146,8 @@ int main()
     TreeGo(*(freq_list.begin()), code, list_code);
 
     ifstream cin("input.txt");
-    string res;
-
+    unsigned char tx = 0;
+    int count = 0;
     while (1)
     {
         c = cin.get();
@@ -164,30 +155,20 @@ int main()
         {
             break;
         }
-        res += GetString(list_code->at(c));
-        
-        if (res.length()>7)
+        vector <bool> x = list_code->at(c);
+        for (int i = 0; i < x.size(); i++)
         {
-            while (res.length() > 7)
+            tx = tx | x[i] << (7 - count);
+            count++;
+            if (count==8)
             {
-                for (int i = 0; i < 7; i++)
-                {
-                    if (res[i]==0)
-                    {
-                        c &= ~(1 << (7 - i));
-                    }
-                    if (res[i] == 1)
-                    {
-                        c |= (1 << (7 - i));
-                    }
-                }
-
-                fout << c;
-                res.erase(0, 8);
+                count = 0;
+                fout << tx;
+                tx = 0;
             }
         }
     }
-
+    fout << tx;
 
     return 0;
 }
