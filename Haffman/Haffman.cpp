@@ -4,6 +4,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <string>
 #define NUM_OF_CHARS 256
 
 using namespace std;
@@ -59,21 +60,33 @@ void TreeGo(Node* head, vector<bool>code, map<char, vector<bool>> *list_code)
     }
 }
 
+string GetString(vector<bool>code)
+{
+    string s;
+    for (auto c: code)
+    {
+        s += c;
+    }
+
+    return s;
+}
+
 int main()
 {
-    ifstream cin("input.txt");
-    ofstream cout("output.txt");
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
     int frequency[NUM_OF_CHARS] = { 0 };
     unsigned char c=0;
     while (1)
     {
-        c = cin.get();
-        if (cin.eof())
+        c = fin.get();
+        if (fin.eof())
         {
             break;
         }
         frequency[c]++;
     }
+    fin.close();
 
     list<Node*>freq_list;
 
@@ -102,6 +115,12 @@ int main()
         }
         freq_list.insert(iter, temp);
     }
+
+    for (auto it : freq_list)
+    {
+        fout << it->token << " " << it->freq << " ";
+    }
+    fout << endl;
     
     while (freq_list.size()!=1)
     {
@@ -134,15 +153,41 @@ int main()
     vector<bool> code;
     map<char, vector<bool>>* list_code = new map<char, vector<bool>>;
     TreeGo(*(freq_list.begin()), code, list_code);
-    
-    for (auto it:*(list_code))
+
+    ifstream cin("input.txt");
+    string res;
+
+    while (1)
     {
-        cout << it.first << " ";
-        for (auto vec: it.second)
+        c = cin.get();
+        if (cin.eof())
         {
-            cout << vec;
+            break;
         }
-        cout << endl;
+        res += GetString(list_code->at(c));
+        
+        if (res.length()>7)
+        {
+            while (res.length() > 7)
+            {
+                for (int i = 0; i < 7; i++)
+                {
+                    if (res[i]==0)
+                    {
+                        c &= ~(1 << (7 - i));
+                    }
+                    if (res[i] == 1)
+                    {
+                        c |= (1 << (7 - i));
+                    }
+                }
+
+                fout << c;
+                res.erase(0, 8);
+            }
+        }
     }
+
+
     return 0;
 }
