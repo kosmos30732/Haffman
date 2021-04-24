@@ -42,7 +42,7 @@ int main()
     ifstream cin("input.txt");
     ofstream cout("output.txt");
     int frequency[NUM_OF_CHARS] = { 0 };
-    char c=0;
+    unsigned char c=0;
     while (1)
     {
         c = cin.get();
@@ -53,7 +53,7 @@ int main()
         frequency[c]++;
     }
 
-    list<Node>freq_list;
+    list<Node*>freq_list;
 
     for (int i = 0; i < NUM_OF_CHARS; i++)
     {
@@ -62,13 +62,13 @@ int main()
             continue;
         }
 
-        Node temp(i, frequency[i]);
+        Node* temp = new Node(i, frequency[i]);
 
         auto iter = freq_list.begin();
 
         for (; iter!=freq_list.end();)
         {
-            if (temp.freq>iter->freq)
+            if (temp->freq>(*iter)->freq)
             {
                 iter++;
             }
@@ -79,17 +79,26 @@ int main()
         }
         freq_list.insert(iter, temp);
     }
-
-
-    for (auto it : freq_list)
-    {
-        cout << it.token << " " << it.freq << endl;
-    }
     /*
-    for (int i = 0; i < NUM_OF_CHARS; i++)
+    while (freq_list.size()!=1)
     {
-        cout << frequency[i] << endl;
+        Node l = freq_list.front();
+        freq_list.pop_front();
+        Node r = freq_list.back();
+        freq_list.pop_front();
+
+        Node new_node(0, l.freq + r.freq);
+        Node* left = new Node();
+        left = l;
+
+
+
     }
     */
+    for (auto it : freq_list)
+    {
+        cout << it->token << " " << it->freq << endl;
+    }
+
     return 0;
 }
