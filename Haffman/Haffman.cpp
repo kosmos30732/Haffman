@@ -71,6 +71,7 @@ int main()
             if (temp->freq>(*iter)->freq)
             {
                 iter++;
+                continue;
             }
             else
             {
@@ -79,26 +80,41 @@ int main()
         }
         freq_list.insert(iter, temp);
     }
-    /*
+    
     while (freq_list.size()!=1)
     {
-        Node l = freq_list.front();
+        Node *l = freq_list.front();
         freq_list.pop_front();
-        Node r = freq_list.back();
+        Node *r = freq_list.front();
         freq_list.pop_front();
 
-        Node new_node(0, l.freq + r.freq);
-        Node* left = new Node();
-        left = l;
+        Node *new_node = new Node(0, l->freq + r->freq);
+        new_node->left = l;
+        new_node->rigth = r;
 
+        auto iter = freq_list.begin();
 
-
+        for (; iter != freq_list.end();)
+        {
+            if (new_node->freq > (*iter)->freq)
+            {
+                iter++;
+                continue;
+            }
+            else
+            {
+                break;
+            }
+        }
+        freq_list.insert(iter, new_node);
+        cout << "New iteration" << endl;
+        for (auto it : freq_list)
+        {
+            cout << it->token << " " << it->freq << endl;
+        }
+        cout << endl;
     }
-    */
-    for (auto it : freq_list)
-    {
-        cout << it->token << " " << it->freq << endl;
-    }
-
+    
+    
     return 0;
 }
