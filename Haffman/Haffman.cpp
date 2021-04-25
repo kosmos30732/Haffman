@@ -65,14 +65,45 @@ void TreeGo(Node* head, vector<bool>code, map<char, vector<bool>> *list_code)
 void Decompression()
 {
     ifstream fin("output.txt");
-    int n, symbol_freq = 0;
-    fin >> n;
-    unsigned char symbol;
+    int n, symbol_freq = 0;    
+    {
+        string t;
+        unsigned char c;
+        while (true)
+        {
+            c = fin.get();
+            if (c==' ')
+            {
+                break;
+            }
+            t += c;
+        }
+        n = stoi(t);
+    }
+    unsigned char symbol, trash;
     list<Node*>freq_list;
 
-    for (int i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
     {
-        fin >> symbol >> symbol_freq;
+        //fin >> symbol >> symbol_freq;
+
+        symbol = fin.get();
+        trash = fin.get();
+        {
+            string t;
+            unsigned char c;
+            while (true)
+            {
+                c = fin.get();
+                if (c == ' ')
+                {
+                    break;
+                }
+                t += c;
+            }
+            symbol_freq = stoi(t);
+        }
+
         Node* temp = new Node(symbol, symbol_freq);
         freq_list.push_back(temp);
     }
@@ -107,35 +138,64 @@ void Decompression()
 
     vector<bool> code;
     map<char, vector<bool>>* list_code = new map<char, vector<bool>>;
-    TreeGo(*(freq_list.begin()), code, list_code);
-    
+    TreeGo(*(freq_list.begin()), code, list_code);    
+
+    ofstream out2("2.txt");
+    for (auto it : *(list_code))
+    {
+        out2 << it.first << " ";
+        for (auto vec : it.second)
+        {
+            out2 << vec;
+        }
+        out2 << endl;
+    }
+    out2.close();
+
+    map<vector<bool>, char>* code_list = new map<vector<bool>, char>;
+    for (auto it:*list_code)
+    {
+        (*code_list)[it.second] = it.first;
+    }
+
     ofstream fout("output_output.txt");
-    unsigned char tx = 0, c = 0;
+    unsigned char c = 0;
+    vector <bool> temp;
+    
     int count = 0;
 
-    while (1)
+    while (true)
     {
         c = fin.get();
-        if (fin.eof())
+        if (fin.bad() && fin.eof())
         {
             break;
         }
-        vector <bool> x = list_code->at(c);
-        for (int i = 0; i < x.size(); i++)
+        fin.clear();
+
+        for (size_t i = 0; i < 8; i++)
         {
-            tx = tx | x[i] << (7 - count);
-            count++;
-            if (count == 8)
+            if (bool((1 << (7-i)) & c))
             {
-                count = 0;
-                fout << tx;
-                tx = 0;
+                temp.push_back(1);
             }
+            else
+            {
+                temp.push_back(0);
+            }
+
+            auto iter = code_list->find(temp);
+            if (iter==code_list->end())
+            {
+                continue;
+            }
+            temp.clear();
+            cout << iter->second;
         }
     }
-    fout << tx;
-    fout.close();
     
+    fout.close();
+    fin.close();
 }
 
 int main()
@@ -157,7 +217,7 @@ int main()
 
     list<Node*>freq_list;
 
-    for (int i = 0; i < NUM_OF_CHARS; i++)
+    for (size_t i = 0; i < NUM_OF_CHARS; i++)
     {
         if (frequency[i]==0)
         {
@@ -189,7 +249,6 @@ int main()
     {
         fout << it->token << " " << it->freq << " ";
     }
-    fout << endl;
     
     while (freq_list.size()!=1)
     {
@@ -223,18 +282,32 @@ int main()
     map<char, vector<bool>>* list_code = new map<char, vector<bool>>;
     TreeGo(*(freq_list.begin()), code, list_code);
 
-    ifstream cin("input.txt");
+    ofstream outt("1.txt");
+
+    for (auto it : *(list_code))
+    {
+        outt << it.first << " ";
+        for (auto vec : it.second)
+        {
+            outt << vec;
+        }
+        outt << endl;
+    }
+
+    outt.close();
+
+    ifstream file_in("input.txt");
     unsigned char tx = 0;
     int count = 0;
     while (1)
     {
-        c = cin.get();
-        if (cin.eof())
+        c = file_in.get();
+        if (file_in.eof())
         {
             break;
         }
         vector <bool> x = list_code->at(c);
-        for (int i = 0; i < x.size(); i++)
+        for (size_t i = 0; i < x.size(); i++)
         {
             tx = tx | x[i] << (7 - count);
             count++;
@@ -248,7 +321,9 @@ int main()
     }
     fout << tx;
     fout.close();
-    cin.close();
+    file_in.close();
     
+    Decompression();
+
     return 0;
 }
