@@ -12,23 +12,29 @@ using namespace std;
 class Node
 {
 public:
-    unsigned char token=0;
-    int freq=0;
-    Node* left=nullptr, * rigth=nullptr;
+    unsigned char token;
+    int freq;
+    Node* left, * rigth;
 
     Node()
     {
-
+        token = 0;
+        freq = 0;
+        left = nullptr;
+        rigth = nullptr;
     }
 
     Node(unsigned char _token, int _freq)
     {
         token = _token;
         freq = _freq;
+        left = nullptr;
+        rigth = nullptr;
     }
 
     Node(Node* _left, Node* _rigth)
     {
+        token = 0;
         freq = _left->freq + _rigth->freq;
         left = _left;
         rigth = _rigth;
@@ -72,13 +78,8 @@ int main()
     unsigned char c=0;
 
     //reading a file and counting the character frequencies in an array
-    while (1)
+    while ((c = fin.get())&& !fin.eof())
     {
-        c = fin.get();
-        if (fin.eof())
-        {
-            break;
-        }
         frequency[c]++;
     }
 
@@ -121,7 +122,7 @@ int main()
     fout << freq_list.size() << " ";
     for (auto it : freq_list)
     {
-        fout << it->token << " " << it->freq << " ";
+        fout << it->token << it->freq << " ";
     }
     
     //building a tree from our list
@@ -132,9 +133,7 @@ int main()
         Node *r = freq_list.front();
         freq_list.pop_front();
 
-        Node *new_node = new Node(0, l->freq + r->freq);
-        new_node->left = l;
-        new_node->rigth = r;
+        Node *new_node = new Node(l,r);
 
         auto iter = freq_list.begin();
 
@@ -161,14 +160,8 @@ int main()
     //we read the next character and compress it
     unsigned char tx = 0;
     int count = 0;
-    while (1)
+    while ((c = fin.get()) && !fin.eof())
     {
-        c = fin.get();
-        if (fin.eof())
-        {
-            break;
-        }
-
         vector <bool> x = list_code->at(c);
         for (size_t i = 0; i < x.size(); i++)
         {
