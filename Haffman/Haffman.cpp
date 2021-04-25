@@ -64,11 +64,12 @@ void TreeGo(Node* head, vector<bool>code, map<char, vector<bool>> *list_code)
 
 void Decompression()
 {
-    ifstream fin("output.txt");
-    int n, symbol_freq = 0;    
+    ifstream fin("output.txt", ios::binary);
+    int n, symbol_freq = 0;
+    unsigned char count = fin.get();
     {
         string t;
-        unsigned char c;
+        unsigned char c = fin.get();
         while (true)
         {
             c = fin.get();
@@ -85,8 +86,6 @@ void Decompression()
 
     for (size_t i = 0; i < n; i++)
     {
-        //fin >> symbol >> symbol_freq;
-
         symbol = fin.get();
         trash = fin.get();
         {
@@ -140,18 +139,6 @@ void Decompression()
     map<char, vector<bool>>* list_code = new map<char, vector<bool>>;
     TreeGo(*(freq_list.begin()), code, list_code);    
 
-    ofstream out2("2.txt");
-    for (auto it : *(list_code))
-    {
-        out2 << it.first << " ";
-        for (auto vec : it.second)
-        {
-            out2 << vec;
-        }
-        out2 << endl;
-    }
-    out2.close();
-
     map<vector<bool>, char>* code_list = new map<vector<bool>, char>;
     for (auto it:*list_code)
     {
@@ -161,17 +148,15 @@ void Decompression()
     ofstream fout("output_output.txt");
     unsigned char c = 0;
     vector <bool> temp;
-    
-    int count = 0;
 
     while (true)
     {
         c = fin.get();
-        if (fin.bad() && fin.eof())
+        if (fin.eof())
         {
-            break;
+            break;            
         }
-        fin.clear();
+        auto end_of_file = fin.peek();
 
         for (size_t i = 0; i < 8; i++)
         {
@@ -190,7 +175,11 @@ void Decompression()
                 continue;
             }
             temp.clear();
-            cout << iter->second;
+            fout << iter->second;
+            if (end_of_file==EOF && i+1==count-'0')
+            {
+                break;
+            }
         }
     }
     
@@ -201,7 +190,7 @@ void Decompression()
 int main()
 {
     ifstream fin("input.txt");
-    ofstream fout("output.txt");
+    ofstream fout("output.txt", ios::binary);
     int frequency[NUM_OF_CHARS] = { 0 };
     unsigned char c=0;
     while (1)
@@ -242,7 +231,7 @@ int main()
         }
         freq_list.insert(iter, temp);
     }
-    
+    fout << "  ";
     fout << freq_list.size() << " ";
 
     for (auto it : freq_list)
@@ -282,20 +271,6 @@ int main()
     map<char, vector<bool>>* list_code = new map<char, vector<bool>>;
     TreeGo(*(freq_list.begin()), code, list_code);
 
-    ofstream outt("1.txt");
-
-    for (auto it : *(list_code))
-    {
-        outt << it.first << " ";
-        for (auto vec : it.second)
-        {
-            outt << vec;
-        }
-        outt << endl;
-    }
-
-    outt.close();
-
     ifstream file_in("input.txt");
     unsigned char tx = 0;
     int count = 0;
@@ -306,6 +281,7 @@ int main()
         {
             break;
         }
+
         vector <bool> x = list_code->at(c);
         for (size_t i = 0; i < x.size(); i++)
         {
@@ -314,15 +290,17 @@ int main()
             if (count==8)
             {
                 count = 0;
-                fout << tx;
+                fout.write((char*)&tx, 1);
                 tx = 0;
             }
         }
     }
-    fout << tx;
+    fout.write((char*)&tx, 1);
+    fout.clear();
+    fout.seekp(0);
+    fout << count;
     fout.close();
-    file_in.close();
-    
+    file_in.close();    
     Decompression();
 
     return 0;
