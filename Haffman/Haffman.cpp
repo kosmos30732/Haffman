@@ -115,14 +115,21 @@ int main()
         freq_list.insert(iter, temp);
     }
 
-    //pre-write two spaces to the beginning, one of which will be overwritten by the number of significant bits in the last byte
-    fout << "  ";
+    //pre-write int to the beginning, one of which will be overwritten by the number of significant bits in the last byte
+    {
+        int n = 0;
+        fout.write((char*)&n, sizeof(n));
+    }
 
     //we write down how many elements are stored in the map, and then the elements themselves and their frequencies are separated by spaces
-    fout << freq_list.size() << " ";
+    {
+        int n = freq_list.size();
+        fout.write((char*)&n, sizeof(n));
+    }
     for (auto it : freq_list)
     {
-        fout << it->token << it->freq << " ";
+        fout.write((char*)&it->token, sizeof(it->token));
+        fout.write((char*)&it->freq, sizeof(it->freq));
     }
     
     //building a tree from our list
@@ -185,7 +192,7 @@ int main()
     //we translate the pointer to the beginning of the file and write the number of significant bits in the last byte
     fout.clear();
     fout.seekp(0);
-    fout << count;
+    fout.write((char*)&count, sizeof(count));
     fout.close();
     fin.close();    
 
