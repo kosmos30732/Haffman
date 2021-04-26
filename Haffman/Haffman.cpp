@@ -177,7 +177,10 @@ int main()
     }
 
     //write the last byte
-    fout.write((char*)&tx, 1);
+    if (count!=0)
+    {
+        fout.write((char*)&tx, 1);
+    }    
 
     //we translate the pointer to the beginning of the file and write the number of significant bits in the last byte
     fout.clear();
