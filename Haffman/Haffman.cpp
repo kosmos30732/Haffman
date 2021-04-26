@@ -177,7 +177,7 @@ int main()
     }
 
     //write the last byte
-    if (count!=0)
+    if (!(count==0 && tx==0))
     {
         fout.write((char*)&tx, 1);
     }    
